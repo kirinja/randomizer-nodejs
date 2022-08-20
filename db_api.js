@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3').verbose()
 const db = new sqlite3.Database('database.db')
+const csv = require('csv')
 
 const query = (command, method = 'all') => {
     return new Promise((resolve, reject) => {
@@ -34,8 +35,16 @@ const getRandomEntry = async () => {
     return await getSelectEntry(value)
 }
 
+const recreateEntries = async () => {
+    await query('DELETE FROM entries')
+    await query('DELETE FROM sqlite_sequence WHERE name = "entries"')
+    // should read from csv file and recreate here
+    return 'Deleted all data in entries table'
+}
+
 module.exports = {
     getAllEntries,
     getSelectEntry,
     getRandomEntry,
+    recreateEntries,
 }

@@ -1,9 +1,12 @@
 const express = require(`express`)
 const api = require('./db_api')
+const bodyParser = require('body-parser')
 
 const app = express()
 const hostname = `127.0.0.1`
 const port = 3000
+
+app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
     res.set('Content-Type', 'application/json')
@@ -21,6 +24,30 @@ app.get('/all', async (req, res) => {
     res.set('Content-Type', 'application/json')
     res.writeHead(200)
     res.end(JSON.stringify(await api.getAllEntries(), null, 3))
+})
+
+app.delete('/delete', async (req, res) => {
+    res.set('Content-Type', 'application/json')
+    res.writeHead(200)
+    res.end(JSON.stringify(await api.recreateEntries(), null, 3))
+})
+
+app.post('/test', bodyParser.raw(), async (req, res) => {
+    if (
+        'content-type' in req.headers &&
+        req.headers['content-type'] !== 'application/octet-stream'
+    ) {
+        res.writeHead(400)
+        res.end('Bad Request')
+        return
+    }
+
+    const buffer = Buffer.from(req.body)
+    console.log(buffer.length)
+    // todo need to figure out how to convert the buffer to something we can read and do a db query with
+    console.log(buffer.toString())
+
+    res.end()
 })
 
 app.listen(port, hostname)
