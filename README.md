@@ -3,7 +3,7 @@ Runs on Node 16, but Node 14/12 are probably supported as well.
 
 - Clone repo
 - Run `npm install` in root directory
-- Run app with either `node app.js` or `npm start`
+- Run app with either `node app.js` or `npm start` or `npx nodemon app.js`
 
 # Usage Example
 

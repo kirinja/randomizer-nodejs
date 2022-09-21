@@ -35,11 +35,34 @@ const getRandomEntry = async () => {
     return await getSelectEntry(value)
 }
 
-const recreateEntries = async () => {
+/**
+ *
+ * @param {string[]} entries
+ * @returns
+ */
+const recreateEntries = async (entries) => {
+    await clearTable()
+    entries.forEach((entry) => {
+        const title = entry[0]
+        const description = entry[1]
+        insertEntry(title, description)
+    })
+}
+
+const insertEntry = async (title, description) => {
+    await query(
+        `INSERT INTO entries (title, description) VALUES ('${title}', '${description}')`
+    )
+}
+
+const clearTable = async () => {
     await query('DELETE FROM entries')
     await query('DELETE FROM sqlite_sequence WHERE name = "entries"')
-    // should read from csv file and recreate here
-    return 'Deleted all data in entries table'
+}
+
+const exportTableToCSV = async () => {
+    // TODO
+    //  export current entries table to a string which we can use to create our CSV file
 }
 
 module.exports = {
@@ -47,4 +70,5 @@ module.exports = {
     getSelectEntry,
     getRandomEntry,
     recreateEntries,
+    exportTableToCSV,
 }

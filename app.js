@@ -43,10 +43,11 @@ app.post('/test', bodyParser.raw(), async (req, res) => {
     }
 
     const buffer = Buffer.from(req.body)
-    console.log(buffer.length)
-    // todo need to figure out how to convert the buffer to something we can read and do a db query with
-    console.log(buffer.toString())
-
+    const entries = buffer.toString().split('\n').slice(1)
+    entries.forEach((element) => {
+        const temp = element.split(';')
+        console.log(temp)
+    })
     res.end()
 })
 
