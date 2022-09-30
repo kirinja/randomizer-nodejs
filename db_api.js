@@ -14,6 +14,15 @@ const query = (command, method = 'all') => {
     })
 }
 
+const insert = async (rows) => {
+    rows.forEach((entry) => {
+        const data = entry.split(';')
+        const title = data[0]
+        const description = data[1]
+        insertEntry(title, description)
+    })
+}
+
 const getAllEntries = async () => {
     const existingPosts = await query('SELECT * FROM entries')
     return existingPosts
@@ -37,22 +46,22 @@ const getRandomEntry = async () => {
 
 /**
  *
- * @param {string[]} entries
+ * @param {string[]} rows
  * @returns
  */
-const recreateEntries = async (entries) => {
+const recreateEntries = async (rows) => {
     await clearTable()
-    entries.forEach((entry) => {
-        const title = entry[0]
-        const description = entry[1]
-        insertEntry(title, description)
-    })
+    insert(rows)
 }
 
 const insertEntry = async (title, description) => {
     await query(
         `INSERT INTO entries (title, description) VALUES ('${title}', '${description}')`
     )
+}
+
+const append = async (rows) => {
+    await insert(rows)
 }
 
 const clearTable = async () => {
@@ -63,6 +72,12 @@ const clearTable = async () => {
 const exportTableToCSV = async () => {
     // TODO
     //  export current entries table to a string which we can use to create our CSV file
+    const data = await query('SELECT * FROM entries')
+    let csvData = 'Title;Description\n'
+    data.forEach((entry) => {
+        csvData = csvData.concat(`${entry.title};${entry.description}\n`)
+    })
+    return csvData
 }
 
 module.exports = {
@@ -71,4 +86,6 @@ module.exports = {
     getRandomEntry,
     recreateEntries,
     exportTableToCSV,
+    clearTable,
+    append,
 }

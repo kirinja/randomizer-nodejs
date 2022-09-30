@@ -1,6 +1,8 @@
 const express = require(`express`)
 const api = require('./db_api')
 const bodyParser = require('body-parser')
+const { application } = require('express')
+const { restart } = require('nodemon')
 
 const app = express()
 const hostname = `127.0.0.1`
@@ -29,7 +31,7 @@ app.get('/all', async (req, res) => {
 app.delete('/delete', async (req, res) => {
     res.set('Content-Type', 'application/json')
     res.writeHead(200)
-    res.end(JSON.stringify(await api.recreateEntries(), null, 3))
+    res.end(JSON.stringify(await api.clearTable(), null, 3))
 })
 
 app.post('/test', bodyParser.raw(), async (req, res) => {
@@ -49,6 +51,28 @@ app.post('/test', bodyParser.raw(), async (req, res) => {
         console.log(temp)
     })
     res.end()
+})
+
+app.post('/append', bodyParser.raw(), async (req, res) => {
+    if (
+        'content-type' in req.headers &&
+        req.headers['content-type'] !== 'application/octet-stream'
+    ) {
+        res.writeHead(400)
+        res.end('Bad Request')
+        return
+    }
+
+    const buffer = Buffer.from(req.body)
+    const rows = buffer.toString().split('\n').slice(1)
+    await api.append(rows)
+    res.end()
+})
+
+app.get('/export', async (req, res) => {
+    res.set('Content-Type', 'application/json')
+    res.writeHead(200)
+    res.end(JSON.stringify(await api.exportTableToCSV(), null, 3))
 })
 
 app.listen(port, hostname)
